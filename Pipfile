@@ -10,6 +10,8 @@ flask = "*"
 flask-marshmallow = "*"
 flask-sqlalchemy = "*"
 marshmallow-sqlalchemy = "*"
+firebase-admin = "*"
+flask-migrate = "*"
 
 [dev-packages]
 
