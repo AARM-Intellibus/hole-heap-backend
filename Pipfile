@@ -12,6 +12,7 @@ flask-sqlalchemy = "*"
 marshmallow-sqlalchemy = "*"
 firebase-admin = "*"
 flask-migrate = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
