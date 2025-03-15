@@ -5,6 +5,11 @@ name = "pypi"
 
 [packages]
 pika = "*"
+python-dotenv = "*"
+flask = "*"
+flask-marshmallow = "*"
+flask-sqlalchemy = "*"
+marshmallow-sqlalchemy = "*"
 
 [dev-packages]
 
