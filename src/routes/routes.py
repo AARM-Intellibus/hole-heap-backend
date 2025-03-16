@@ -86,6 +86,7 @@ def location():
     validated_request['previous_latitude'] = previous_location['latitude']
     validated_request['previous_longitude'] = previous_location['longitude']
     session['last_location'] = json.dumps({'latitude': validated_request['latitude'], 'longitude': validated_request['longitude']})
+    validated_request['user_id'] = g.uid
     send_message_to_bus(validated_request, MessageTypes.NEW_USER_LOCATION)
 
     return jsonify(data=[]),202
@@ -104,6 +105,7 @@ def register_new_pothole():
         500 - err: Exception
     """    
     validated_request = _deserialize_and_validate_request(RegisterPotholeRequest())
+    validated_request['user_id'] = g.uid
     send_message_to_bus(validated_request, MessageTypes.REGISTER_POTHOLE)
 
     return jsonify(data=[]),202
@@ -123,6 +125,7 @@ def confirm_whether_a_pothole_exists():
     """
     validated_request = _deserialize_and_validate_request(PotholeRealStatusRequest())
     is_real = validated_request[PotholeRealStatusRequest.is_real.name]
+    validated_request['user_id'] = g.uid
     send_message_to_bus(validated_request, MessageTypes.POTHOLE_EXISTS if is_real else MessageTypes.POTHOLE_NOT_REAL)
 
     return jsonify(data=[]),202
@@ -142,6 +145,7 @@ def confirm_whether_a_pothole_was_fixed():
     """
     validated_request = _deserialize_and_validate_request(PotholeFixStatusRequest())
     is_fixed = validated_request[PotholeFixStatusRequest.is_fixed.name]
+    validated_request['user_id'] = g.uid
     send_message_to_bus(validated_request, MessageTypes.POTHOLE_FIXED if is_fixed else MessageTypes.POTHOLE_NOT_FIXED)
 
     return jsonify(data=[]),202
@@ -160,6 +164,7 @@ def save_user_settings():
         500 - err: Exception
     """
     validated_request = _deserialize_and_validate_request(SaveUserSettingsRequest())
+    validated_request['user_id'] = g.uid
     send_message_to_bus(validated_request, MessageTypes.SAVE_USER_SETTINGS)
 
     return jsonify(data=[]),202
