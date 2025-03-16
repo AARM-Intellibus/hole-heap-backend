@@ -90,7 +90,7 @@ def location():
         session['last_location'] = json.dumps({'latitude': validated_request['latitude'], 'longitude': validated_request['longitude']})
         send_message_to_bus(validated_request, MessageTypes.NEW_USER_LOCATION)
 
-        return 202
+        return jsonify(data=[]),202
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
 
@@ -111,7 +111,7 @@ def register_new_pothole():
         validated_request = _deserialize_and_validate_request(RegisterPotholeRequest())
         send_message_to_bus(validated_request, MessageTypes.REGISTER_POTHOLE)
 
-        return 202
+        return jsonify(data=[]),202
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
 
@@ -133,7 +133,7 @@ def confirm_whether_a_pothole_exists():
         is_real = validated_request[PotholeRealStatusRequest.is_real.name]
         send_message_to_bus(validated_request, MessageTypes.POTHOLE_EXISTS if is_real else MessageTypes.POTHOLE_NOT_REAL)
 
-        return 202
+        return jsonify(data=[]),202
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
 
@@ -155,7 +155,7 @@ def confirm_whether_a_pothole_was_fixed():
         is_fixed = validated_request[PotholeFixStatusRequest.is_fixed.name]
         send_message_to_bus(validated_request, MessageTypes.POTHOLE_FIXED if is_fixed else MessageTypes.POTHOLE_NOT_FIXED)
 
-        return 202
+        return jsonify(data=[]),202
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
 
@@ -176,7 +176,7 @@ def save_user_settings():
         validated_request = _deserialize_and_validate_request(SaveUserSettingsRequest())
         send_message_to_bus(validated_request, MessageTypes.SAVE_USER_SETTINGS)
 
-        return 202
+        return jsonify(data=[]),202
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
     pass
