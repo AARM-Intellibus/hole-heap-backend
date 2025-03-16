@@ -108,3 +108,13 @@ class ProcessLocationChangeRequest(Schema):
     """
     The longitude portion of the user's current location
     """
+
+    previous_latitude=fields.Decimal()
+    """
+    The latitude portion of the user's location the last time the API was called
+    """
+    
+    previous_longitude=fields.Decimal()
+    """
+    The longitude portion of the user's location the last time the API was called
+    """
