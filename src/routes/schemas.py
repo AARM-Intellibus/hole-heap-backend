@@ -108,3 +108,10 @@ class ProcessLocationChangeRequest(Schema):
     """
     The longitude portion of the user's current location
     """
+
+class SaveUserSettingsRequest(Schema):
+    user_id = fields.Str(required=True)
+
+    min_danger_level = fields.Enum(PotholeDangerLevel, required=True, by_value=True)
+
+    pref_distance_range = fields.Integer(required=True)
