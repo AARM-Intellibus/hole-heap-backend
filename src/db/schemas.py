@@ -17,7 +17,7 @@ class UserPotholeFixedSchema(ma.SQLAlchemySchema):
     
     uid = ma.auto_field()
     pid =  ma.auto_field()
-    isFixed =  ma.auto_field()
+    is_fixed =  ma.auto_field()
 
 class UserPotholeExistSchema(ma.SQLAlchemySchema):
     class Meta:
@@ -25,7 +25,7 @@ class UserPotholeExistSchema(ma.SQLAlchemySchema):
     
     uid = ma.auto_field()
     pid =  ma.auto_field()
-    doesExist =  ma.auto_field()
+    does_exist =  ma.auto_field()
 
 class PotholeSchema(ma.SQLAlchemySchema):
     class Meta:

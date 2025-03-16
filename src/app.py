@@ -26,10 +26,6 @@ creds = credentials.Certificate(FIREBASE_CONFIG)
 firebase_admin.initialize_app(creds)
 firestore_db = firestore.client()
 
-from event.config import bus_consumer_worker 
-
-bus_consumer_worker.start()
-
 from db.models.user_settings import UserSetting
 from db.models.pothole import Pothole
 from db.models.user_pothole_fixed import UserPotholeFixed
