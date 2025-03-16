@@ -45,17 +45,17 @@ def _consume_collaback(channel :Channel, method :Basic.Deliver, properties: Basi
     print(f"Received message of type {message_type}")
 
     try:
-        if(message_type == MessageTypes.REGISTER_POTHOLE.value):
+        if(message_type == MessageTypes.REGISTER_POTHOLE.name):
             process_register_pothole(body)
-        if(message_type == MessageTypes.POTHOLE_NOT_FIXED.value):
+        if(message_type == MessageTypes.POTHOLE_NOT_FIXED.name):
             process_pothole_not_fixed(body)
-        if(message_type == MessageTypes.NEW_USER_LOCATION.value):
+        if(message_type == MessageTypes.NEW_USER_LOCATION.name):
             process_location_changed(body)
-        if(message_type == MessageTypes.POTHOLE_EXISTS.value):
+        if(message_type == MessageTypes.POTHOLE_EXISTS.name):
             process_pothole_exists(body)
-        if(message_type == MessageTypes.POTHOLE_FIXED.value):
+        if(message_type == MessageTypes.POTHOLE_FIXED.name):
             process_pothole_fixed(body)
-        if(message_type == MessageTypes.POTHOLE_NOT_REAL.value):
+        if(message_type == MessageTypes.POTHOLE_NOT_REAL.name):
             process_pothole_not_real(body)
 
         # any other message type is ignored
