@@ -3,9 +3,9 @@ Contains the setup for the message bus integration
 """
 
 import atexit
+from multiprocessing import Process
 import os
 import sys
-from threading import Thread
 from typing import Any
 import uuid
 from flask import jsonify
@@ -82,5 +82,5 @@ def listen_for_messages():
 
 atexit.register(shutdown_channels)
 
-# Create a new thread to run the listener on because it is a blocking call
-bus_consumer_worker = Thread(target=listen_for_messages)
+# Create a new process to run the listener on because it is a blocking call
+bus_consumer_worker = Process(target=listen_for_messages)
