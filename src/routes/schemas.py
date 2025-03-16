@@ -78,7 +78,7 @@ class RegisterPotholeRequest(Schema):
     The danger level as rated by the user
     """
     
-    street_name= fields.Str(required=True)
+    street_name= fields.Str()
     """
     The street the pothole is on. This is stored for quick access for reporting purposes 
     """
