@@ -14,9 +14,12 @@ from firebase_admin import credentials, firestore
 
 load_dotenv()
 
+from config.environ import SECRET_KEY, SQLALCHEMY_DATABASE_URI
+
 app = Flask(__name__)
+app.secret_key = SECRET_KEY
 jwt = JWTManager(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 migrate = Migrate(app, db)
