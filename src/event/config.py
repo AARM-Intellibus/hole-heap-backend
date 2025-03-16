@@ -1,3 +1,7 @@
+"""
+Contains the setup for the message bus integration
+"""
+
 import os
 import sys
 from typing import Any
