@@ -13,6 +13,7 @@ class Pothole(db.Model):
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     danger_level = db.Column(db.String(10), nullable=False)
     street_name = db.Column(db.String(100), nullable=False)
+    image = db.Column(db.String, nullable=False)
 
     @hybrid_property
     def fixed_upvotes(self):
