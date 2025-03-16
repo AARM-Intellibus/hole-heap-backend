@@ -4,9 +4,11 @@ Contains the methods to process messages from the bus
 
 from typing import Any, Callable
 from marshmallow import Schema
+from sqlalchemy import asc
 from db.models.pothole import Pothole
 from db.models.user_pothole_exist import UserPotholeExist
 from db.schemas import PotholeSchema, UserPotholeExistSchema
+from event.direction import get_direction, get_surrounding_location_matrix
 from event.schemas import PotholeExistsMessage, RegisterPotholeMessage, UserLocationChangeEvent
 
 from config import firestore_db, db
@@ -123,7 +125,35 @@ def process_pothole_not_fixed(message):
 def process_location_changed(message):
     try:
         user_location_changed = UserLocationChangeEvent().load(message)
-        # determine whether to warn users
+        direction = get_direction(
+            (user_location_changed['previous_latitude'], user_location_changed['previous_longitude']), 
+            (user_location_changed['latitude'], user_location_changed['longitude']))
+        
+        matrix = get_surrounding_location_matrix(
+            user_location_changed['latitude'],
+            user_location_changed['longitude'],
+            direction)
+
+        potholes_nearby = []
+        for [lat,lon] in matrix:
+            pothole_nearby = Pothole.query.filter(Pothole.latitude>=lat, Pothole.longitude>=lon).order_by(
+                asc(
+                    abs(Pothole.latitude-user_location_changed['latitude'])+abs(Pothole.longitude-user_location_changed['longitude']))).first()
+            if(pothole_nearby):
+                potholes_nearby.append(pothole_nearby)
+
+
+        if(potholes_nearby):
+            nearest_pothole = pothole_nearby[0]
+            nearest_distance = abs(nearest_pothole.latitude-user_location_changed['latitude'])+abs(nearest_pothole.longitude-user_location_changed['longitude'])
+            for pothole in potholes_nearby:
+                next_distance = abs(pothole.latitude-user_location_changed['latitude'])+abs(pothole.longitude-user_location_changed['longitude'])
+                if(next_distance < nearest_distance):
+                    nearest_distance = next_distance
+                    nearest_pothole = pothole
+        
+            firestore_db.collection('warnings').document(user_location_changed['user_id']).set(pothole)
+
     except Exception as e:
         print(e)
 
