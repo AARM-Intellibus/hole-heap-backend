@@ -2,8 +2,10 @@
 Contains the setup for the message bus integration
 """
 
+import atexit
 import os
 import sys
+from threading import Thread
 from typing import Any
 import uuid
 from flask import jsonify
@@ -44,6 +46,8 @@ def _consume_collaback(channel :Channel, method :Basic.Deliver, properties: Basi
     print(f"{channel} - {method} - {properties} - {body}")
     message_type = properties.type
 
+    print(f"Received message of type {message_type}")
+
     try:
         if(message_type == MessageTypes.REGISTER_POTHOLE.value):
             process_register_pothole(body)
@@ -57,6 +61,8 @@ def _consume_collaback(channel :Channel, method :Basic.Deliver, properties: Basi
             process_pothole_fixed(body)
         if(message_type == MessageTypes.POTHOLE_NOT_REAL.value):
             process_pothole_not_real(body)
+
+        # any other message type is ignored
     except Exception as e:
         print(e)    
 
@@ -64,6 +70,7 @@ def _consume_collaback(channel :Channel, method :Basic.Deliver, properties: Basi
 channel.basic_consume(ENVIRON_QUEUE_NAME, _consume_collaback, auto_ack=True)
 
 def listen_for_messages():
+    print("Listening for messages from the bus...")
     try:
         channel.start_consuming()
     except Exception as e:
@@ -72,3 +79,8 @@ def listen_for_messages():
             sys.exit(-1)
         except SystemExit:
             os._exit(-1)
+
+atexit.register(shutdown_channels)
+
+# Create a new thread to run the listener on because it is a blocking call
+bus_consumer_worker = Thread(target=listen_for_messages)
