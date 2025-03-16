@@ -4,14 +4,15 @@ Contains the API routes for Hole Heap
 
 
 from functools import wraps
-from flask import abort, g, jsonify, make_response, request
+from flask import Blueprint, abort, g, jsonify, make_response, request
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
 from marshmallow import Schema, ValidationError
-from ..config import app
 from event.config import send_message_to_bus
 from event.schemas import MessageTypes
 from routes.schemas import PotholeFixStatusRequest, PotholeRealStatusRequest, ProcessLocationChangeRequest, RegisterPotholeRequest
 from firebase_admin import auth
+
+app_routes = Blueprint('main_routes', __name__)
 
 def firebase_jwt_required():
     """
@@ -58,8 +59,8 @@ def firebase_jwt_required():
         return decorated
     return wrapper
 
-@app.route('/location', methods=['POST'])
-@firebase_jwt_required
+@app_routes.route('/location', methods=['POST'])
+@firebase_jwt_required()
 def location():
     """
     Accepts updates for the user location from the client
@@ -80,8 +81,8 @@ def location():
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
 
-@app.route('/pothole', methods=['POST'])
-@firebase_jwt_required
+@app_routes.route('/pothole', methods=['POST'])
+@firebase_jwt_required()
 def register_new_pothole():
     """
     Allows a new pothole to be added to the app
@@ -101,8 +102,8 @@ def register_new_pothole():
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
 
-@app.route('/pothole/exists', methods=['POST'])
-@firebase_jwt_required
+@app_routes.route('/pothole/exists', methods=['POST'])
+@firebase_jwt_required()
 def confirm_whether_a_pothole_exists():
     """
     Allows users to upvote and downvote whether a pothole listed in the app exists.
@@ -123,8 +124,8 @@ def confirm_whether_a_pothole_exists():
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
 
-@app.route('/pothole/fixed', methods=['POST'])
-@firebase_jwt_required
+@app_routes.route('/pothole/fixed', methods=['POST'])
+@firebase_jwt_required()
 def confirm_whether_a_pothole_was_fixed():
     """
     Allows users to upvote or downvote whether a pothole was fixed

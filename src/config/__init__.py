@@ -30,3 +30,8 @@ from db.models.user_settings import UserSetting
 from db.models.pothole import Pothole
 from db.models.user_pothole_fixed import UserPotholeFixed
 from db.models.user_pothole_exist import UserPotholeExist
+
+
+from routes.routes import app_routes
+
+app.register_blueprint(app_routes)
