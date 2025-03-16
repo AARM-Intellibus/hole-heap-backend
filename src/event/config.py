@@ -13,7 +13,7 @@ from pika import BasicProperties
 from pika.channel import Channel
 from pika.spec import Basic
 
-from config import MESSAGE_BROKER_URL
+from config.environ import MESSAGE_BROKER_URL
 from event.processor import process_location_changed, process_pothole_exists, process_pothole_fixed, process_pothole_not_fixed, process_pothole_not_real, process_register_pothole
 from event.schemas import MessageTypes
 

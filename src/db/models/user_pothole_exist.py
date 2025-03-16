@@ -1,4 +1,4 @@
-from app import db
+from config import db
 from uuid import uuid4
 
 class UserPotholeExist(db.Model):
@@ -7,4 +7,4 @@ class UserPotholeExist(db.Model):
     user_id = db.Column(db.String(50), nullable=False)
     pothole_id = db.Column(db.ForeignKey('pothole.id'), nullable=False)
     does_exist = db.Column(db.Boolean, nullable=False )
-    pothole = db.relationship('Pothole', back_populates='pothole')
+    pothole = db.relationship('Pothole')

@@ -7,7 +7,7 @@ from functools import wraps
 from flask import abort, g, jsonify, make_response, request
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
 from marshmallow import Schema, ValidationError
-from app import app
+from ..config import app
 from event.config import send_message_to_bus
 from event.schemas import MessageTypes
 from routes.schemas import PotholeFixStatusRequest, PotholeRealStatusRequest, ProcessLocationChangeRequest, RegisterPotholeRequest

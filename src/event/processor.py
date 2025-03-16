@@ -7,9 +7,9 @@ from marshmallow import Schema
 from db.models.pothole import Pothole
 from db.models.user_pothole_exist import UserPotholeExist
 from db.schemas import PotholeSchema, UserPotholeExistSchema
-from event.schemas import PotholeExistsMessage, PotholeFixedMessage, PotholeNotFixedMessage, PotholeNotRealMessage, RegisterPotholeMessage, UserLocationChangeEvent
+from event.schemas import PotholeExistsMessage, RegisterPotholeMessage, UserLocationChangeEvent
 
-from app import firestore_db, db
+from config import firestore_db, db
 
 def _validate_message_load_body(validator:Schema, model_serializer:Schema, message_body:str):
     """
