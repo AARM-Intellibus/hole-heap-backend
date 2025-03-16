@@ -12,7 +12,7 @@ from db.schemas import PotholeSchema, UserPotholeExistSchema, UserSettingSchema
 from event.direction import get_direction, get_surrounding_location_matrix
 from event.schemas import PotholeExistsMessage, RegisterPotholeMessage, SaveUserSettingsMessage, UserLocationChangeEvent
 
-from config import firestore_db, db
+from config import firestore_db, db, app
 
 def _validate_message_load_body(validator:Schema, model_serializer:Schema, message_body:str):
     """
@@ -32,11 +32,10 @@ def _validate_message_load_body(validator:Schema, model_serializer:Schema, messa
     Raises:
         ValidationError: when schema validation fails
     """
-
     # validate the message body
-    message = validator.load(message_body) # will throw exception if message is malformed
+    message = validator.loads(message_body) # will throw exception if message is malformed
     # deserialize message into db model
-    model = model_serializer.load(message_body, load_instance=True)
+    model = model_serializer.loads(message_body)
 
     return message, model
 
@@ -47,15 +46,17 @@ def _save_model_trigger_pothole_updates(validator:Schema, model_serializer:Schem
     adjust_model_pre_save(db_model,register_pothole_cmd)
 
     # save updates to db
-    db.session.add(db_model)
-    db.session.commit()
+
+    with app.app_context():
+        db.session.add(db_model)
+        db.session.commit()
 
     # push updates to firebase so that the client pothole feeds can be updated
     _post_pothole_update(db_model.id, db_model)
 
 def process_register_pothole(message):
     def mutate_model(model,msg):
-        model.created_by_uid = msg['user_id']
+        pass
     
     try:
         _save_model_trigger_pothole_updates(RegisterPotholeMessage(), PotholeSchema(), message,  mutate_model)
@@ -66,56 +67,58 @@ def process_pothole_exists(message):
     _toggle_pothole_exists(message, True)
 
 def _toggle_pothole_exists(message:str, pothole_exists: bool):
-    try:
-        db_model, _ = _validate_message_load_body(PotholeExistsMessage(),UserPotholeExistSchema(), message)
+    with app.app_context():
+        try:
+            db_model, _ = _validate_message_load_body(PotholeExistsMessage(),UserPotholeExistSchema(), message)
 
-        db_model.does_exist = pothole_exists
+            db_model.does_exist = pothole_exists
 
-        pothole:Pothole = Pothole.query.get(db_model.pothole_id)
+            pothole:Pothole = Pothole.query.get(db_model.pothole_id)
 
-        if(pothole):
-            existing_upvote = UserPotholeExist.query.filter_by(uid = db_model.user_id, pid=db_model.pothole_id).first()
+            if(pothole):
+                existing_upvote = UserPotholeExist.query.filter_by(uid = db_model.user_id, pid=db_model.pothole_id).first()
 
-            # if they already upvoted this pothole, treat the command as a toggle to remove the upvote
-            if existing_upvote:
-                db.session.delete(existing_upvote)
-            else:
-                db.session.add(db_model)
+                # if they already upvoted this pothole, treat the command as a toggle to remove the upvote
+                if existing_upvote:
+                    db.session.delete(existing_upvote)
+                else:
+                    db.session.add(db_model)
 
-            db.session.commit()
-            db.session.refresh(pothole)
+                db.session.commit()
+                db.session.refresh(pothole)
 
-            _post_pothole_update(pothole.id, pothole)
+                _post_pothole_update(pothole.id, pothole)
 
-    except Exception as e:
-            print(e)
+        except Exception as e:
+                print(e)
 
 def process_pothole_fixed(message):
     _toggle_pothole_fixed(message, True)
 
 def _toggle_pothole_fixed(message:str, is_fixed:bool):
-    try:
-        db_model, _ = _validate_message_load_body(PotholeExistsMessage(),UserPotholeExistSchema(), message)
+    with app.app_context():
+        try:
+            db_model, _ = _validate_message_load_body(PotholeExistsMessage(),UserPotholeExistSchema(), message)
 
-        db_model.is_fixed = is_fixed
+            db_model.is_fixed = is_fixed
 
-        pothole:Pothole = Pothole.query.get(db_model.pothole_id)
+            pothole:Pothole = Pothole.query.get(db_model.pothole_id)
 
-        if(pothole):
-            existing_upvote = UserPotholeExist.query.filter_by(uid = db_model.user_id, pid=db_model.pothole_id).first()
+            if(pothole):
+                existing_upvote = UserPotholeExist.query.filter_by(uid = db_model.user_id, pid=db_model.pothole_id).first()
 
-            # if they already upvoted this pothole, treat the command as a toggle to remove the upvote
-            if existing_upvote:
-                db.session.delete(existing_upvote)
-            else:
-                db.session.add(db_model)
+                # if they already upvoted this pothole, treat the command as a toggle to remove the upvote
+                if existing_upvote:
+                    db.session.delete(existing_upvote)
+                else:
+                    db.session.add(db_model)
 
-            db.session.commit()
-            db.session.refresh(pothole)
+                db.session.commit()
+                db.session.refresh(pothole)
 
-            _post_pothole_update(pothole.id, pothole)
-    except Exception as e:
-        print(e)
+                _post_pothole_update(pothole.id, pothole)
+        except Exception as e:
+            print(e)
 
 def process_pothole_not_real(message):
     _toggle_pothole_exists(message, False)
@@ -124,39 +127,40 @@ def process_pothole_not_fixed(message):
     _toggle_pothole_fixed(message, True)
 
 def process_location_changed(message):
-    try:
-        user_location_changed = UserLocationChangeEvent().load(message)
-        direction = get_direction(
-            (user_location_changed['previous_latitude'], user_location_changed['previous_longitude']), 
-            (user_location_changed['latitude'], user_location_changed['longitude']))
-        
-        matrix = get_surrounding_location_matrix(
-            user_location_changed['latitude'],
-            user_location_changed['longitude'],
-            direction)
+    with app.app_context():
+        try:
+            user_location_changed = UserLocationChangeEvent().loads(message)
+            direction = get_direction(
+                (user_location_changed['previous_latitude'], user_location_changed['previous_longitude']), 
+                (user_location_changed['latitude'], user_location_changed['longitude']))
+            
+            matrix = get_surrounding_location_matrix(
+                user_location_changed['latitude'],
+                user_location_changed['longitude'],
+                direction)
 
-        potholes_nearby = []
-        for [lat,lon] in matrix:
-            pothole_nearby = Pothole.query.filter(Pothole.latitude>=lat, Pothole.longitude>=lon).order_by(
-                asc(
-                    abs(Pothole.latitude-user_location_changed['latitude'])+abs(Pothole.longitude-user_location_changed['longitude']))).first()
-            if(pothole_nearby):
-                potholes_nearby.append(pothole_nearby)
+            potholes_nearby = []
+            for [lat,lon] in matrix:
+                pothole_nearby = Pothole.query.filter(Pothole.latitude>=lat, Pothole.longitude>=lon).order_by(
+                    asc(
+                        abs(Pothole.latitude-user_location_changed['latitude'])+abs(Pothole.longitude-user_location_changed['longitude']))).first()
+                if(pothole_nearby):
+                    potholes_nearby.append(pothole_nearby)
 
 
-        if(potholes_nearby):
-            nearest_pothole = pothole_nearby[0]
-            nearest_distance = abs(nearest_pothole.latitude-user_location_changed['latitude'])+abs(nearest_pothole.longitude-user_location_changed['longitude'])
-            for pothole in potholes_nearby:
-                next_distance = abs(pothole.latitude-user_location_changed['latitude'])+abs(pothole.longitude-user_location_changed['longitude'])
-                if(next_distance < nearest_distance):
-                    nearest_distance = next_distance
-                    nearest_pothole = pothole
-        
-            firestore_db.collection('warnings').document(user_location_changed['user_id']).set(pothole)
+            if(potholes_nearby):
+                nearest_pothole = pothole_nearby[0]
+                nearest_distance = abs(nearest_pothole.latitude-user_location_changed['latitude'])+abs(nearest_pothole.longitude-user_location_changed['longitude'])
+                for pothole in potholes_nearby:
+                    next_distance = abs(pothole.latitude-user_location_changed['latitude'])+abs(pothole.longitude-user_location_changed['longitude'])
+                    if(next_distance < nearest_distance):
+                        nearest_distance = next_distance
+                        nearest_pothole = pothole
+            
+                firestore_db.collection('warnings').document(user_location_changed['user_id']).set(pothole)
 
-    except Exception as e:
-        print(e)
+        except Exception as e:
+            print(e)
 
 def process_save_user_settigs(message):    
     try:

@@ -42,6 +42,8 @@ def _consume_collaback(channel :Channel, method :Basic.Deliver, properties: Basi
     print(f"{channel} - {method} - {properties} - {body}")
     message_type = properties.type
 
+    body = body.decode('utf-8')
+
     print(f"Received message of type {message_type}")
 
     try:

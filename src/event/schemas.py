@@ -36,7 +36,6 @@ class RegisterPotholeMessage(Schema):
     (See routes/schemas.py for additional docs)
     """
     user_id = fields.Str(required=True)
-    street_name = fields.Str(required=True)
     latitude = fields.Float(required=True)
     longitude = fields.Float(required=True)
     danger_level = fields.Enum(PotholeDangerLevel, by_value=True, required=True)
