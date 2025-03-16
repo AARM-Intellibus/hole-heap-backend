@@ -33,7 +33,7 @@ def _validate_message_load_body(validator:Schema, model_serializer:Schema, messa
     # validate the message body
     message = validator.load(message_body) # will throw exception if message is malformed
     # deserialize message into db model
-    model = model_serializer.load(message_body)
+    model = model_serializer.load(message_body, load_instance=True)
 
     return message, model
 
