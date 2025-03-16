@@ -8,7 +8,7 @@ from flask import Blueprint, abort, g, json, jsonify, make_response, request, se
 from marshmallow import Schema, ValidationError
 from event.config import send_message_to_bus
 from event.schemas import MessageTypes
-from routes.schemas import PotholeFixStatusRequest, PotholeRealStatusRequest, ProcessLocationChangeRequest, RegisterPotholeRequest
+from routes.schemas import PotholeFixStatusRequest, PotholeRealStatusRequest, ProcessLocationChangeRequest, RegisterPotholeRequest, SaveUserSettingsRequest
 from firebase_admin import auth
 
 app_routes = Blueprint('main_routes', __name__)
@@ -156,6 +156,28 @@ def confirm_whether_a_pothole_was_fixed():
         return 202
     except Exception as unknownErr:
         return jsonify(unknownErr), 500
+
+@app_routes.route('/user_settings', methods=['POST'])
+@firebase_jwt_required()
+def save_user_settings():
+    """
+    Allows users to save their settings in the database
+
+    Body: SaveUserSettingsRequest
+
+    Returns:
+        202 - None
+        400 - errors: dict
+        500 - err: Exception
+    """
+    try:
+        validated_request = _deserialize_and_validate_request(SaveUserSettingsRequest())
+        send_message_to_bus(validated_request, MessageTypes.SAVE_USER_SETTINGS)
+
+        return 202
+    except Exception as unknownErr:
+        return jsonify(unknownErr), 500
+    pass
 
 
 def _deserialize_and_validate_request(schema:Schema):

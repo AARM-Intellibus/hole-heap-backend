@@ -17,6 +17,7 @@ class MessageTypes(Enum):
     POTHOLE_NOT_FIXED = 'POTHOLE_NOT_FIXED'
     WARN_USER_OF_POTHOLE = 'WARN_USER_OF_POTHOLE'
     NEW_USER_LOCATION = 'NEW_USER_LOCATION'
+    SAVE_USER_SETTINGS = 'SAVE_USER_SETTINGS'
 
 class PotholeDangerLevel(Enum):
     """
@@ -91,4 +92,14 @@ class WarnUserOfPotholeMessage(Schema):
     latitude = fields.Decimal(required=True)
     longitude = fields.Decimal(required=True)
     danger_level = fields.Enum(PotholeDangerLevel, by_value=True, required=True)
+
+class SaveUserSettingsMessage(Schema):
+    """
+    Represents the body of message from the bus for saving user settings for a user in the database
+
+    (See routes/schemas.py for additional docs)
+    """
+    user_id = fields.Str(required=True)
+    min_danger_level = fields.Enum(PotholeDangerLevel, required=True, by_value=True)
+    pref_distance_range = fields.Integer(required=True)
 

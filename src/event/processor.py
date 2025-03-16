@@ -7,9 +7,10 @@ from marshmallow import Schema
 from sqlalchemy import asc
 from db.models.pothole import Pothole
 from db.models.user_pothole_exist import UserPotholeExist
-from db.schemas import PotholeSchema, UserPotholeExistSchema
+from db.models.user_settings import UserSetting
+from db.schemas import PotholeSchema, UserPotholeExistSchema, UserSettingSchema
 from event.direction import get_direction, get_surrounding_location_matrix
-from event.schemas import PotholeExistsMessage, RegisterPotholeMessage, UserLocationChangeEvent
+from event.schemas import PotholeExistsMessage, RegisterPotholeMessage, SaveUserSettingsMessage, UserLocationChangeEvent
 
 from config import firestore_db, db
 
@@ -157,6 +158,31 @@ def process_location_changed(message):
     except Exception as e:
         print(e)
 
+def process_save_user_settigs(message):    
+    try:
+        _save_model_trigger_user_settings(SaveUserSettingsMessage(), UserSettingSchema(), message)
+    except Exception as e:
+        print(e)
+
+def _save_model_trigger_user_settings(validator:Schema, model_serializer:Schema, message_body:str, adjust_model_pre_save: Callable[[Any, dict], None]):
+    try:
+        db_model, save_user_setting_cmd = _validate_message_load_body(validator,model_serializer, message_body)
+
+        # map fields
+        adjust_model_pre_save(db_model, save_user_setting_cmd)
+
+        # save updates to db
+        db.session.add(db_model)
+        db.session.commit()
+
+        user_setting:UserSetting = UserSetting.query.get(db_model.user_id)
+
+        if(not user_setting):
+            # save updates to db
+            db.session.add(db_model)
+            db.session.commit()
+    except Exception as e:
+        print(e)
 
 def _post_pothole_update(pothole_id:str,data:dict ):
     firestore_db.collection('pothole_feed').document(pothole_id).set(data)
