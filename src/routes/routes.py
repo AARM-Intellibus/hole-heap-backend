@@ -4,8 +4,7 @@ Contains the API routes for Hole Heap
 
 
 from functools import wraps
-from flask import Blueprint, abort, g, jsonify, make_response, request
-from flask_jwt_extended import get_jwt, verify_jwt_in_request
+from flask import Blueprint, abort, g, json, jsonify, make_response, request, session
 from marshmallow import Schema, ValidationError
 from event.config import send_message_to_bus
 from event.schemas import MessageTypes
@@ -40,9 +39,17 @@ def firebase_jwt_required():
                 401, 403
             """
             try:
-                verify_jwt_in_request()
-                submitted_jwt = get_jwt()
-                print(submitted_jwt)
+                header_value =request.headers.get('Authorization')
+
+                if header_value == None or not header_value.startswith('Bearer '):
+                    abort(401)
+
+                token_parts = header_value.split(' ')
+
+                if(len(token_parts!=2)):
+                    abort(401, 'malformed header')
+
+                submitted_jwt = token_parts[-1]
 
                 decoded_token = auth.verify_id_token(submitted_jwt, check_revoked=True)
                 
@@ -75,6 +82,10 @@ def location():
     """
     try:
         validated_request = _deserialize_and_validate_request(ProcessLocationChangeRequest())
+        previous_location = json.loads(session['last_location'])
+        validated_request['previous_latitude'] = previous_location['latitude']
+        validated_request['previous_longitude'] = previous_location['longitude']
+        session['last_location'] = json.dumps({'latitude': validated_request['latitude'], 'longitude': validated_request['longitude']})
         send_message_to_bus(validated_request, MessageTypes.NEW_USER_LOCATION)
 
         return 202

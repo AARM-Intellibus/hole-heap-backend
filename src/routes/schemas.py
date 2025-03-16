@@ -109,9 +109,29 @@ class ProcessLocationChangeRequest(Schema):
     The longitude portion of the user's current location
     """
 
+    previous_latitude=fields.Decimal()
+    """
+    The latitude portion of the user's location the last time the API was called
+    """
+    
+    previous_longitude=fields.Decimal()
+    """
+    The longitude portion of the user's location the last time the API was called
+    """
+
 class SaveUserSettingsRequest(Schema):
     user_id = fields.Str(required=True)
+    """
+    The firebase user ID for the user making the request
+    """
 
     min_danger_level = fields.Enum(PotholeDangerLevel, required=True, by_value=True)
+    """
+    The minimum alert level for the firebase user ID
+    """
 
     pref_distance_range = fields.Integer(required=True)
+    """
+    The prefered distance level for the firebase user ID
+    """
+    

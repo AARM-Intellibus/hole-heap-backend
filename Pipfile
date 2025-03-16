@@ -15,6 +15,7 @@ flask-migrate = "*"
 flask-jwt-extended = "*"
 psycopg2-binary = "*"
 gunicorn = "*"
+haversine = "*"
 
 [dev-packages]
 
