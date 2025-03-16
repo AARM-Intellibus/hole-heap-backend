@@ -25,3 +25,8 @@ migrate = Migrate(app, db)
 FIREBASE_CONFIG = os.environ.get('FIREBASE_CONFIGS')
 creds = credentials.Certificate(FIREBASE_CONFIG)
 firebase_admin.initialize_app(creds)
+
+if(__name__ == "__main__"):
+    app.run(debug= os.environ.get("IS_DEBUG") == "True", 
+        host= os.environ.get('HOST'),
+        port=os.environ.get('PORT'))
