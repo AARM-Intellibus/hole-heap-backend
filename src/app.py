@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 #Firebase Imports
 import firebase_admin
-from firebase_admin import credentials
+from firebase_admin import credentials, firestore
 
 load_dotenv()
 
@@ -24,6 +24,11 @@ migrate = Migrate(app, db)
 FIREBASE_CONFIG = os.environ.get('FIREBASE_CONFIGS')
 creds = credentials.Certificate(FIREBASE_CONFIG)
 firebase_admin.initialize_app(creds)
+firestore_db = firestore.client()
+
+from event.config import bus_consumer_worker 
+
+bus_consumer_worker.start()
 
 from db.models.user_settings import UserSetting
 from db.models.pothole import Pothole

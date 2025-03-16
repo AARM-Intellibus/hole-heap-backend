@@ -1,3 +1,7 @@
+"""
+Contains the methods to process messages from the bus
+"""
+
 from event.schemas import PotholeExistsMessage, PotholeFixedMessage, PotholeNotFixedMessage, PotholeNotRealMessage, RegisterPotholeMessage, UserLocationChangeEvent
 
 
