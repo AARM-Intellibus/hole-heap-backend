@@ -86,8 +86,7 @@ def location():
     validated_request['previous_latitude'] = previous_location['latitude']
     validated_request['previous_longitude'] = previous_location['longitude']
     session['last_location'] = json.dumps({'latitude': validated_request['latitude'], 'longitude': validated_request['longitude']})
-    validated_request['user_id'] = g.uid
-    send_message_to_bus(validated_request, MessageTypes.NEW_USER_LOCATION)
+    send_message_to_bus(validated_request, MessageTypes.NEW_USER_LOCATION.name)
 
     return jsonify(data=[]),202
 
@@ -104,9 +103,9 @@ def register_new_pothole():
         400 - errors: dict
         500 - err: Exception
     """    
-    validated_request = _deserialize_and_validate_request(RegisterPotholeRequest())
-    validated_request['user_id'] = g.uid
-    send_message_to_bus(validated_request, MessageTypes.REGISTER_POTHOLE)
+    schema =RegisterPotholeRequest()
+    validated_request = _deserialize_and_validate_request(schema)
+    send_message_to_bus(validated_request, schema, MessageTypes.REGISTER_POTHOLE.name)
 
     return jsonify(data=[]),202
 
@@ -125,8 +124,7 @@ def confirm_whether_a_pothole_exists():
     """
     validated_request = _deserialize_and_validate_request(PotholeRealStatusRequest())
     is_real = validated_request[PotholeRealStatusRequest.is_real.name]
-    validated_request['user_id'] = g.uid
-    send_message_to_bus(validated_request, MessageTypes.POTHOLE_EXISTS if is_real else MessageTypes.POTHOLE_NOT_REAL)
+    send_message_to_bus(validated_request, MessageTypes.POTHOLE_EXISTS.name if is_real else MessageTypes.POTHOLE_NOT_REAL.name)
 
     return jsonify(data=[]),202
 
@@ -145,8 +143,7 @@ def confirm_whether_a_pothole_was_fixed():
     """
     validated_request = _deserialize_and_validate_request(PotholeFixStatusRequest())
     is_fixed = validated_request[PotholeFixStatusRequest.is_fixed.name]
-    validated_request['user_id'] = g.uid
-    send_message_to_bus(validated_request, MessageTypes.POTHOLE_FIXED if is_fixed else MessageTypes.POTHOLE_NOT_FIXED)
+    send_message_to_bus(validated_request, MessageTypes.POTHOLE_FIXED.name if is_fixed else MessageTypes.POTHOLE_NOT_FIXED.name)
 
     return jsonify(data=[]),202
 
@@ -164,8 +161,7 @@ def save_user_settings():
         500 - err: Exception
     """
     validated_request = _deserialize_and_validate_request(SaveUserSettingsRequest())
-    validated_request['user_id'] = g.uid
-    send_message_to_bus(validated_request, MessageTypes.SAVE_USER_SETTINGS)
+    send_message_to_bus(validated_request, MessageTypes.SAVE_USER_SETTINGS.name)
 
     return jsonify(data=[]),202
 
@@ -183,8 +179,8 @@ def _deserialize_and_validate_request(schema:Schema):
     """
     try:
         body = request.get_json()
+        body['user_id'] = g.uid
         validated_request = schema.load(body)
-        validated_request['user_id'] = g.uid
         return validated_request
     except ValidationError as validationErr:
         abort(make_response(jsonify(validationErr.messages), 400))

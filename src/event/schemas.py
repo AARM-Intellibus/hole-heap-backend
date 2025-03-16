@@ -36,8 +36,8 @@ class RegisterPotholeMessage(Schema):
     """
     user_id = fields.Str(required=True)
     street_name = fields.Str(required=True)
-    latitude = fields.Decimal(required=True)
-    longitude = fields.Decimal(required=True)
+    latitude = fields.Float(required=True)
+    longitude = fields.Float(required=True)
     danger_level = fields.Enum(PotholeDangerLevel, by_value=True, required=True)
     image= fields.Str(required=True)
 
@@ -84,13 +84,30 @@ class UserLocationChangeEvent(Schema):
     (See routes/schemas.py for additional docs)
     """
     user_id=fields.Str(required=True)
-    latitude=fields.Str(required=True)
-    longitude=fields.Str(required=True)
+    latitude=fields.Float(required=True)
+    """
+    The latitude portion of the user's current location
+    """
+    
+    longitude=fields.Float(required=True)
+    """
+    The longitude portion of the user's current location
+    """
+
+    previous_latitude=fields.Float()
+    """
+    The latitude portion of the user's location the last time the API was called
+    """
+    
+    previous_longitude=fields.Float()
+    """
+    The longitude portion of the user's location the last time the API was called
+    """
 
 class WarnUserOfPotholeMessage(Schema):
     user_id = fields.Str(required=True)
-    latitude = fields.Decimal(required=True)
-    longitude = fields.Decimal(required=True)
+    latitude = fields.Float(required=True)
+    longitude = fields.Float(required=True)
     danger_level = fields.Enum(PotholeDangerLevel, by_value=True, required=True)
 
 class SaveUserSettingsMessage(Schema):
