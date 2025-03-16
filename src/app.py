@@ -17,7 +17,6 @@ load_dotenv()
 app = Flask(__name__)
 jwt = JWTManager(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 migrate = Migrate(app, db)
@@ -30,6 +29,11 @@ firestore_db = firestore.client()
 from event.config import bus_consumer_worker 
 
 bus_consumer_worker.start()
+
+from db.models.user_settings import UserSetting
+from db.models.pothole import Pothole
+from db.models.user_pothole_fixed import UserPotholeFixed
+from db.models.user_pothole_exist import UserPotholeExist
 
 if(__name__ == "__main__"):
     app.run(debug= os.environ.get("IS_DEBUG") == "True", 
