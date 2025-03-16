@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8cf0892684952a8fc4f98aa90d293c7c7c5c5cc91ec8209607f1b1a243c4282d"
+            "sha256": "a084f0e8e98ccf36dc243e6be06b1014cf5aa9802dd3914509faf620f63bebd0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -301,6 +301,15 @@
             "index": "pypi",
             "markers": "python_version >= '3.9'",
             "version": "==3.1.0"
+        },
+        "flask-jwt-extended": {
+            "hashes": [
+                "sha256:52f35bf0985354d7fb7b876e2eb0e0b141aaff865a22ff6cc33d9a18aa987978",
+                "sha256:8085d6757505b6f3291a2638c84d207e8f0ad0de662d1f46aa2f77e658a0c976"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.9' and python_version < '4'",
+            "version": "==4.7.1"
         },
         "flask-marshmallow": {
             "hashes": [

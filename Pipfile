@@ -12,6 +12,7 @@ flask-sqlalchemy = "*"
 marshmallow-sqlalchemy = "*"
 firebase-admin = "*"
 flask-migrate = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 
