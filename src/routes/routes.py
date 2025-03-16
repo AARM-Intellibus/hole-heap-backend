@@ -46,7 +46,9 @@ def firebase_jwt_required():
 
                 token_parts = header_value.split(' ')
 
-                if(len(token_parts!=2)):
+                print(token_parts)
+
+                if(len(token_parts)!=2):
                     abort(401, 'malformed header')
 
                 submitted_jwt = token_parts[-1]
