@@ -63,12 +63,12 @@ class RegisterPotholeRequest(Schema):
     The Base64 encoded string of the picture taken of the pothole
     """
 
-    latitude=fields.Decimal(required=True)
+    latitude=fields.Float(required=True)
     """
     The latitude portion of the pothole location
     """
 
-    longitude=fields.Decimal(required=True)
+    longitude=fields.Float(required=True)
     """
     The longitude portion of the pothole location
     """
@@ -99,22 +99,22 @@ class ProcessLocationChangeRequest(Schema):
     The firebase user ID for the user making the request
     """
 
-    latitude=fields.Decimal(required=True)
+    latitude=fields.Float(required=True)
     """
     The latitude portion of the user's current location
     """
     
-    longitude=fields.Decimal(required=True)
+    longitude=fields.Float(required=True)
     """
     The longitude portion of the user's current location
     """
 
-    previous_latitude=fields.Decimal()
+    previous_latitude=fields.Float()
     """
     The latitude portion of the user's location the last time the API was called
     """
     
-    previous_longitude=fields.Decimal()
+    previous_longitude=fields.Float()
     """
     The longitude portion of the user's location the last time the API was called
     """

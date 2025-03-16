@@ -8,6 +8,7 @@ import sys
 from typing import Any
 import uuid
 from flask import json
+from marshmallow import Schema
 import pika
 from pika import BasicProperties
 from pika.channel import Channel
@@ -24,10 +25,10 @@ channel = connection.channel()
 
 channel.queue_declare(queue=ENVIRON_QUEUE_NAME, durable=True)
 
-def send_message_to_bus(body:Any, type:str):
-    channel.basic_publish(exchange='', routing_key=ENVIRON_QUEUE_NAME, body=json.dumps(body), properties=BasicProperties(
+def send_message_to_bus(body:Any,schema:Schema, type:str):
+    channel.basic_publish(exchange='', routing_key=ENVIRON_QUEUE_NAME, body=schema.dumps(body), properties=BasicProperties(
         content_type= 'application/json',
-        message_id= uuid.uuid4(),
+        message_id= uuid.uuid4().hex,
         type= type))
 
 def shutdown_channels():
